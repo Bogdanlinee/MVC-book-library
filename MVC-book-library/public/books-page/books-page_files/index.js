@@ -3,17 +3,16 @@ var drawItemsOnScroll,
 console.log(isScrollRunning);
 
 $(document).ready(function () {
-
     (function () {
-
         data = {
-            filter: getParameterByName('filter') || "new",
+            filter: getParameterByName('filter') || 'new',
             offset: getParameterByName('offset'),
-            limit: getParameterByName('count') || global.items_limit_on_page_load
+            limit: getParameterByName('count') || window.items_limit_on_page_load
         };
 
         setSidebarActiveButton(null, data.filter);
-        doAjaxQuery('GET', '/api/v1/books', data, function (res) {
+
+        $.ajax('GET', '/api/v1/books', data, function (res) {
             console.log('qindex');
             view.addBooksItems(res.data.books, true);
             drawItemsOnScroll = initDrawItemsOnScroll(res.data.total.amount);
@@ -29,7 +28,7 @@ $(document).ready(function () {
     });
 
     $(document).scroll(function () {
-        if ((( $(document).height() - $(window).scrollTop() ) < ( 2 * $(window).height() )) && !isScrollRunning) {
+        if ((($(document).height() - $(window).scrollTop()) < (2 * $(window).height())) && !isScrollRunning) {
             isScrollRunning = true;
             drawItemsOnScroll();
         }
@@ -39,33 +38,33 @@ $(document).ready(function () {
 function getParameterByName(name, url) {
     if (!url) url = $(location).attr('href');
     // console.log(url);
-    name = name.replace(/[\[\]]/g, "\\$&");
-    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+    name = name.replace(/[\[\]]/g, '\\$&');
+    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
         results = regex.exec(url);
     if (!results) return null;
     if (!results[2]) return '';
-    return decodeURIComponent(results[2].replace(/\+/g, " "));
+    return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
 
 var initDrawItemsOnScroll = function (maxItems) {
     var maxNumOfItems = maxItems,
-        limit = global.number_of_items_onscroll,
-        offset = parseInt(getParameterByName('count')) || global.items_limit_on_page_load;
+        limit = window.number_of_items_onscroll,
+        offset = parseInt(getParameterByName('count')) || window.items_limit_on_page_load;
 
     return function () {
         if (offset < maxNumOfItems) {
             var data = {
-                'filter': getParameterByName('filter') || "new",
+                'filter': getParameterByName('filter') || 'new',
                 'limit': limit,
                 'offset': offset
             };
-            $("#loading").slideDown();
-            doAjaxQuery('GET', '/api/v1/books', data,
+            $('#loading').slideDown();
+            $.ajax('GET', '/api/v1/books', data,
                 function (res) {
-                    $("#loading").slideUp();
+                    $('#loading').slideUp();
                     isScrollRunning = false;
                     view.addBooksItems(res.data.books, false);
-                    changeHistoryStateWithParams("replace", res.data.filter, res.data.offset);
+                    changeHistoryStateWithParams('replace', res.data.filter, res.data.offset);
                 });
             offset += limit;
         }
@@ -73,7 +72,7 @@ var initDrawItemsOnScroll = function (maxItems) {
 };
 
 function loadIndexPage(reqData) {
-    doAjaxQuery('GET', '/api/v1/books', reqData, function (res) {
+    $ajax('GET', '/api/v1/books', reqData, function (res) {
         view.addBooksItems(res.data.books, true);
         changeHistoryStateWithParams('push', res.data.filter, res.data.offset);
         drawItemsOnScroll = initDrawItemsOnScroll(res.data.total.amount);
