@@ -13,6 +13,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const dotenv_1 = __importDefault(require("dotenv"));
+const dbConnection_1 = __importDefault(require("./db/dbConnection"));
+dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = 3000;
 app.use(express_1.default.static('public/book-page'));
@@ -23,6 +26,19 @@ app.use(express_1.default.static('public/books-page'));
 app.get('*', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.json({ lol: 'lol' });
 }));
-app.listen(port, () => {
+app.listen(port, () => __awaiter(void 0, void 0, void 0, function* () {
+    // migration to create new db
+    // const filePath = path.join(__dirname, '../db/createDB.sql');
+    // const fileData = await fs.readFile(filePath, {encoding: 'utf-8'});
+    // console.log(fileData);
+    if (!process.env.MYSQL_CONNECTION) {
+        throw new Error('No db credentials');
+    }
+    (0, dbConnection_1.default)(process.env.MYSQL_CONNECTION);
+    try {
+    }
+    catch (err) {
+        console.log(err);
+    }
     console.log('server is running');
-});
+}));
