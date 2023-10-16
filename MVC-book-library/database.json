@@ -1,0 +1,13 @@
+{
+  "dev": {
+    "driver": "mysql",
+    "user": {
+      "ENV": "MYSQL_LOGIN_AND_PASSWORD"
+    },
+    "password": {
+      "ENV": "MYSQL_LOGIN_AND_PASSWORD"
+    },
+    "database": "book_library",
+    "multipleStatements": true
+  }
+}

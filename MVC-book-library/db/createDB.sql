@@ -1,1 +1,1 @@
-CREATE SCHEMA `bookLibrary`;
+CREATE SCHEMA `book_library`;

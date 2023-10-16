@@ -14,27 +14,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
-const dbConnection_1 = __importDefault(require("./db/dbConnection"));
+const dbConnection_1 = require("./db/dbConnection");
+const morgan_1 = __importDefault(require("morgan"));
+const booksRoutes_1 = __importDefault(require("./routes/booksRoutes"));
+const singleBookRoutes_1 = __importDefault(require("./routes/singleBookRoutes"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = 3000;
-app.use(express_1.default.static('public/book-page'));
-app.use(express_1.default.static('public/books-page'));
-// /api/v1/?offset=N
-// /api/v1/books/{book_id}
-// /admin/api/v1/.
-app.get('*', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    res.json({ lol: 'lol' });
-}));
+app.use((0, morgan_1.default)('tiny'));
+// serve static
+app.use('/', express_1.default.static('public/books-page'));
+app.use('/book/:id', express_1.default.static('public/book-page'));
+// serve static
+app.use('/api/v1/books', booksRoutes_1.default);
+app.use('/api/v1/book', singleBookRoutes_1.default);
 app.listen(port, () => __awaiter(void 0, void 0, void 0, function* () {
-    // migration to create new db
-    // const filePath = path.join(__dirname, '../db/createDB.sql');
-    // const fileData = await fs.readFile(filePath, {encoding: 'utf-8'});
-    // console.log(fileData);
     if (!process.env.MYSQL_CONNECTION) {
         throw new Error('No db credentials');
     }
-    (0, dbConnection_1.default)(process.env.MYSQL_CONNECTION);
+    (0, dbConnection_1.connectDB)(process.env.MYSQL_CONNECTION);
     try {
     }
     catch (err) {

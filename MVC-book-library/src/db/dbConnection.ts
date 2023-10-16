@@ -1,8 +1,12 @@
 import mysql, {Connection} from 'mysql';
 
 let db: Connection;
-
-export default (credentials: string) => {
+const connectDB = (credentials: string) => {
     db = mysql.createConnection(JSON.parse(credentials));
     db.connect();
+}
+
+export {
+    db,
+    connectDB,
 }

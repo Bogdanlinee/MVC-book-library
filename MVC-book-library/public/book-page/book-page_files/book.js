@@ -1,18 +1,21 @@
 var pathname = $(location).attr('pathname');
-var bookIdPosition = pathname.lastIndexOf('/') + 1;
+var bookIdPosition = pathname.split('/')[2];
+console.log(bookIdPosition);
 var isBookInUse = false;
 var bookId;
 
-// doAjaxQuery('GET', '/api/v1/books/' + pathname.substr(bookIdPosition), null, function(res) {
-//     view.fillBookInfo(res.data);
-//     if (res.data.event) {
-//         isBookInUse = true;
-//         bookId = res.data.id;
-//     }
-// });
+$.ajax({
+    method: 'GET', url: '/api/v1/book/' + bookIdPosition, data: null, success: function (res) {
+        view.fillBookInfo(res.data);
+        if (res.data.event) {
+            isBookInUse = true;
+            bookId = res.data.id;
+        }
+    }
+});
 
 /* --------------------Show the result, for sending the -----------------------
-----------------------email in the queue for the book ---------------------- */
+ ----------------------email in the queue for the book ---------------------- */
 // var showResultSendEmailToQueue = function(email, result) {
 //     var busy = $('#bookID').attr('busy');
 //     $('.form-queue', '.btnBookID', (busy === null) ? '.freeBook' : '.busyBook').css('display', 'none');
@@ -47,8 +50,9 @@ var bookId;
 //         }
 //     }
 // });
+
 /*------------------ Sending email by clicking on the button ----------------*/
-$('.btnBookID').click(function(event) {
+$('.btnBookID').click(function (event) {
     // var email = $('.orderEmail').val();
     // var isEmail = controller.validateEmail(email);
     // if (isEmail) {
@@ -66,13 +70,13 @@ $('.btnBookID').click(function(event) {
     // } else 
     {
         alert(
-            "Книга свободна и ты можешь прийти за ней." +
-            " Наш адрес: г. Кропивницкий, переулок Васильевский 10, 5 этаж." +
-            " Лучше предварительно прозвонить и предупредить нас, чтоб " +
-            " не попасть в неловкую ситуацию. Тел. 099 196 24 69"+
-            " \n\n"+
-            "******************\n"+
-            "Кстати, если вы читаете этот текст, то автор сайта еще не отсылает ajax запрос на увеличение количества кликов на кнопку по этой книге"
+            'Книга свободна и ты можешь прийти за ней.' +
+            ' Наш адрес: г. Кропивницкий, переулок Васильевский 10, 5 этаж.' +
+            ' Лучше предварительно прозвонить и предупредить нас, чтоб ' +
+            ' не попасть в неловкую ситуацию. Тел. 099 196 24 69' +
+            ' \n\n' +
+            '******************\n' +
+            'Кстати, если вы читаете этот текст, то автор сайта еще не отсылает ajax запрос на увеличение количества кликов на кнопку по этой книге'
         );
     }
 });

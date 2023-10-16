@@ -1,41 +1,64 @@
 /* ----------------------------- begin view ----------------------------------*/
 var view = {
-    fillFields: function(obj, fields, func) {
+    fillFields: function (obj, fields, func) {
         fields = fields.split(/, */);
-        fields.map(function(f) {
+        fields.map(function (f) {
             ($('#' + f)[func])(obj[f]);
         });
     },
-    selectFields: function(fields, func) {
+    selectFields: function (fields, func) {
         var obj = {};
         fields = fields.split(/, */);
-        fields.map(function(f) {
+        fields.map(function (f) {
             var v = ($('#' + f)[func])();
             obj[f] = (v);
         });
         return obj;
     },
-    showErrEmail: function() {
+    showErrEmail: function () {
         var c = '.input-group';
         $(c).removeClass('has-success');
         $(c).addClass('has-error');
         view.hideElement('.glyphicon-ok');
         view.showElement('.glyphicon-remove');
     },
-    showSuccessEmail: function() {
+    showSuccessEmail: function () {
         var c = '.input-group';
         $(c).removeClass('has-error');
         $(c).addClass('has-success');
         view.hideElement('.glyphicon-remove');
         view.showElement('.glyphicon-ok');
     },
-    addBookItem: function(book) {
-        return $('#pattern').html()
-            .replace(/{id}/g, book.id)
-            .replace(/{title}/g, book.title)
-            .replace(/{author}/g, book.author);
+    addBookItem: function (book) {
+        var newElement = $('<div>')
+            .attr('data-book-id', book.id)
+            .addClass('book_item col-xs-6 col-sm-3 col-md-2 col-lg-2')
+            .append(
+                $('<div>').addClass('book').append(
+                    $('<a>').attr('href', `http://localhost:3000/book/${book.id}`).append(
+                        $('<img>').attr('src', `./books-page_files/${book.id}.jpg`)
+                            .attr('alt', book.title),
+                        $('<div>').attr('data-title', book.title)
+                            .addClass('blockI')
+                            .css('height', '46px').append(
+                            $('<div>').attr('data-book-title', book.title)
+                                .addClass('title size_text')
+                                .text(book.title),
+                            $('<div>').attr('data-book-author', book.author)
+                                .addClass('author')
+                                .text(book.author)
+                        )
+                    ),
+                    $('<a>').attr('href', `http://localhost:3000/book/${book.id}`).append(
+                        $('<button>').attr('type', 'button')
+                            .addClass('details btn btn-success')
+                            .text('Читать')
+                    )
+                )
+            );
+        return newElement.prop('outerHTML');
     },
-    addBooksItems: function(books, doClean) {
+    addBooksItems: function (books, doClean) {
         var content = $('#content');
         var contentHTML = ((doClean) ? '' : content.html());
 
@@ -46,15 +69,15 @@ var view = {
         content.html(contentHTML);
         $('.blockI').matchHeight(); // Aligns all the height of the book
     },
-    showNot_found: function(searchText, pathUrl) {
+    showNot_found: function (searchText, pathUrl) {
         var contentNotFound = $('#not_found').html()
             .replace(/{searchText}/g, searchText);
         $('#content').html(contentNotFound);
     },
-    nullToDash: function(string) {
+    nullToDash: function (string) {
         return (((string == null) || (string == 0)) ? '-' : string);
     },
-    addBooksListRow: function(book) {
+    addBooksListRow: function (book) {
         var date;
         if (book.date) {
             date = new Date(book.date);
@@ -72,7 +95,7 @@ var view = {
             .replace(/{date}/g, view.nullToDash(date))
             .replace(/{pawn}/g, view.nullToDash(book.pawn));
     },
-    addBooksList: function(res) {
+    addBooksList: function (res) {
         var content = $('#table_content');
         var contentHTML = '';
         // console.log("Количество книг: " + res.data.books.length);
@@ -82,13 +105,13 @@ var view = {
 
         content.html(contentHTML);
 
-        $('.book_list_row').click(function() {
+        $('.book_list_row').click(function () {
             $(location).attr('href', 'admin/book/' + $(this).attr('data-book-id'));
         });
     },
-    fillBookInfo: function(book) {
+    fillBookInfo: function (book) {
         // console.log(book);
-        view.fillFields(book, 'title,author,year,pages,isbn,description', "html");
+        view.fillFields(book, 'title,author,year,pages,isbn,description', 'html');
         $('#id').attr({
             'book-id': book.id,
             'busy': book.event
@@ -96,20 +119,20 @@ var view = {
         $('#bookImg img').attr('src', '/img/books/' + book.id + '.jpg');
         $('.description').html(book.description);
     },
-    normalDateFormat: function(date) {
+    normalDateFormat: function (date) {
         return date.toISOString().substring(0, 10);
     },
-    addPopUpBlock: function(title, text) {
+    addPopUpBlock: function (title, text) {
         $('#main').after('<div id="test-modal" class="mfp-hide white-popup-block"><h1>' + title + '</h1><p>' + text + '</p><p><a class="popup-modal-dismiss" href="#">X</a></p></div>');
     },
-    showError: function(text) {
+    showError: function (text) {
         swal('Ооопс!', text, 'error');
     },
-    showSuccess: function(text) {
+    showSuccess: function (text) {
         // console.log(text);
         swal('Отлично!', text, 'success');
     },
-    showSubscribe: function(text, bookId) {
+    showSubscribe: function (text, bookId) {
         swal({
                 title: 'Хотите почитать?',
                 text: text,
@@ -121,7 +144,7 @@ var view = {
                 confirmButtonColor: '#27AE60',
                 showLoaderOnConfirm: true
             },
-            function(inputValue) {
+            function (inputValue) {
                 if (inputValue === false) {
                     return false;
                 }
@@ -131,12 +154,12 @@ var view = {
                 }
                 doAjaxQuery('GET', '/api/v1/books/' + bookId + '/order', {
                     'email': inputValue
-                }, function(res) {
+                }, function (res) {
                     view.showSuccess('Ваш e-mail ' + inputValue + '\nдобавлен в список ожидания.');
                 });
             });
     },
-    showConfirm: function(bookId) {
+    showConfirm: function (bookId) {
         swal({
                 title: 'Вы уверены?',
                 text: 'Согласие приведет к невозвратимому удалению книги',
@@ -147,20 +170,20 @@ var view = {
                 confirmButtonText: 'Да, уверен!',
                 closeOnConfirm: false
             },
-            function() {
-                doAjaxQuery('GET', '/admin/api/v1/books/' + bookId + '/remove', null, function(res) {
+            function () {
+                doAjaxQuery('GET', '/admin/api/v1/books/' + bookId + '/remove', null, function (res) {
                     swal({
                             title: 'Удалено!',
                             text: 'Надеюсь, вы осознаете что сейчас произошло ))',
                             type: 'success'
                         },
-                        function() {
+                        function () {
                             window.location.href = '/admin';
                         });
                 });
             });
     },
-    addMiniItemSearch: function(pathUrl, book) {
+    addMiniItemSearch: function (pathUrl, book) {
         var id = (book.id == 'no-cover') ? '#not_found' : '#miniItem';
         return $(id).html()
             .replace(/{id}/g, book.id)
@@ -168,7 +191,7 @@ var view = {
             .replace(/{title}/g, book.title)
             .replace(/{author}/g, book.author);
     },
-    addMiniItemsSearch: function(pathUrl, books, text) {
+    addMiniItemsSearch: function (pathUrl, books, text) {
         var content = $('#list');
         content.html('');
         var contentHTML = content.html();
@@ -195,13 +218,12 @@ var view = {
 
 /* --------------------------- begin controller ------------------------------*/
 var controller = {
-    validateEmail: function(value) {
+    validateEmail: function (value) {
         var regex = /^[-\w.]+@([A-z0-9][-A-z0-9]+\.)+[A-z]{2,10}$/;
         return regex.test(value);
     }
 };
 /* --------------------------- end controller --------------------------------*/
-
 
 /* ------------------------ Jquery Ajax function ---------------------------- */
 
@@ -212,27 +234,27 @@ function doAjaxQuery(method, url, data, callback) {
         contentType: 'application/json',
         dataType: 'json',
         data: ((method == 'POST') ? JSON.stringify(data) : data),
-        success: function(res) {
+        success: function (res) {
             if (!res.success) {
                 view.showError(res.msg);
                 return;
             }
             callback(res);
         },
-        error: function(jqXHR, textStatus) {
+        error: function (jqXHR, textStatus) {
             view.showError('Ошибка ' + textStatus);
         }
     });
 }
 
-$(function() {
+$(function () {
     $('.popup-modal').magnificPopup({
         type: 'inline',
         preloader: false,
         focus: '#username',
         modal: true
     });
-    $(document).on('click', '.popup-modal-dismiss', function(e) {
+    $(document).on('click', '.popup-modal-dismiss', function (e) {
         e.preventDefault();
         $.magnificPopup.close();
     });
@@ -245,10 +267,9 @@ var global = {
 };
 
 function htmlspecialchars(html) {
-    html = html.replace(/&/g, "&amp;");
-    html = html.replace(/</g, "&lt;");
-    html = html.replace(/>/g, "&gt;");
-    html = html.replace(/"/g, "&quot;");
+    html = html.replace(/&/g, '&amp;');
+    html = html.replace(/</g, '&lt;');
+    html = html.replace(/>/g, '&gt;');
+    html = html.replace(/"/g, '&quot;');
     return html;
-
 }

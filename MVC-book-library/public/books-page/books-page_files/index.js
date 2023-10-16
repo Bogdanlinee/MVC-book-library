@@ -1,6 +1,5 @@
 var drawItemsOnScroll,
     isScrollRunning = false;
-console.log(isScrollRunning);
 
 $(document).ready(function () {
     (function () {
@@ -12,13 +11,14 @@ $(document).ready(function () {
 
         setSidebarActiveButton(null, data.filter);
 
-        $.ajax('GET', '/api/v1/books', data, function (res) {
-            console.log('qindex');
-            view.addBooksItems(res.data.books, true);
-            drawItemsOnScroll = initDrawItemsOnScroll(res.data.total.amount);
-            if (localStorage.getItem('h')) {
-                $(window).scrollTop(localStorage.getItem('h'));
-                localStorage.removeItem('h');
+        $.ajax({
+            type: 'GET', url: '/api/v1/books', data, success: function (res) {
+                view.addBooksItems(res.data.books, true);
+                drawItemsOnScroll = initDrawItemsOnScroll(res.data.total.amount);
+                if (localStorage.getItem('h')) {
+                    $(window).scrollTop(localStorage.getItem('h'));
+                    localStorage.removeItem('h');
+                }
             }
         });
     }());
