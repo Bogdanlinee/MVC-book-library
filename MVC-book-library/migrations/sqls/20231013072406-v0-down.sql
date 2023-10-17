@@ -1,1 +1,1 @@
-drop table `book_library`.`books`;
+drop table `book_library`.`admin`;

@@ -37,7 +37,6 @@ $(document).ready(function () {
 
 function getParameterByName(name, url) {
     if (!url) url = $(location).attr('href');
-    // console.log(url);
     name = name.replace(/[\[\]]/g, '\\$&');
     var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
         results = regex.exec(url);

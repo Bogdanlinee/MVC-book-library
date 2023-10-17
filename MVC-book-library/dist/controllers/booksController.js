@@ -11,14 +11,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const dbConnection_1 = require("../db/dbConnection");
 const getAllBooks = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = dbConnection_1.db.query("SELECT * FROM book_library.books", function (err, result, fields) {
-        if (err) {
-            throw err;
-        }
-        let booksData = JSON.parse(JSON.stringify(result));
-        res.status(200).json({
-            data: { books: booksData, }
+    try {
+        const result = dbConnection_1.db.query("SELECT * FROM book_library.books", function (err, result, fields) {
+            if (err) {
+                throw err;
+            }
+            let booksData = JSON.parse(JSON.stringify(result));
+            res.status(200).json({ data: { books: booksData, } });
         });
-    });
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
 });
 exports.default = getAllBooks;

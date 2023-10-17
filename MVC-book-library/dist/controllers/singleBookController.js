@@ -12,15 +12,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const dbConnection_1 = require("../db/dbConnection");
 const getBook = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id: bookId } = req.params;
-    console.log(bookId);
-    const result = dbConnection_1.db.query(`SELECT * FROM book_library.books WHERE id=${bookId}`, function (err, result, fields) {
-        if (err) {
-            throw err;
-        }
-        let bookData = JSON.parse(JSON.stringify(result));
-        res.status(200).json({
-            data: bookData[0],
+    try {
+        const result = dbConnection_1.db.query(`SELECT * FROM book_library.books WHERE id=${bookId}`, function (err, result, fields) {
+            if (err) {
+                throw err;
+            }
+            let bookData = JSON.parse(JSON.stringify(result));
+            res.status(200).json({ data: bookData[0], });
         });
-    });
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
 });
 exports.default = getBook;
