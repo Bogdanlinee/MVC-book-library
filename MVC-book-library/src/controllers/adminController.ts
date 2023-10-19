@@ -16,22 +16,13 @@ const getAllBooks = async (req: Request, res: Response) => {
     }
 }
 
-const getBook = async (req: Request, res: Response) => {
-    const {id: bookId} = req.params;
-    try {
-        const result = db.query(`SELECT * FROM book_library.books WHERE id=${bookId}`, function (err, result, fields) {
-            if (err) {
-                throw err;
-            }
+const deleteOneBook = async (req: Request, res: Response) => {
 
-            let bookData = JSON.parse(JSON.stringify(result));
-
-            res.status(200).json({data: bookData[0],});
-        });
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({error: 'Internal Server Error'});
-    }
 }
 
-export {getAllBooks, getBook};
+const createOneBook = async (req: Request, res: Response) => {
+    console.log(req.body);
+    res.status(200).redirect('/admin/');
+}
+
+export {getAllBooks, createOneBook, deleteOneBook}

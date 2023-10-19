@@ -5,7 +5,7 @@ var isBookInUse = false;
 var bookId;
 
 $.ajax({
-    method: 'GET', url: '/api/v1/book/' + bookIdPosition, data: null, success: function (res) {
+    method: 'GET', url: '/api/v1/books/' + bookIdPosition, data: null, success: function (res) {
         view.fillBookInfo(res.data);
         if (res.data.event) {
             isBookInUse = true;
