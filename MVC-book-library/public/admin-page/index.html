@@ -100,13 +100,12 @@
                     <button class="btn btn-success logoutElement">Logout</button>
                     <script>
                         document.querySelector('.logoutElement').addEventListener('click', function () {
-                            fetch('/admin', {
+                            fetch('/admin/api/v1/logout', {
                                 method: 'GET',
                                 headers: {
                                     'authorization': ''
                                 }
                             })
-
                             window.location.href = '/';
                         })
                     </script>
@@ -120,7 +119,7 @@
 </section>
 <section id="main" class="main-wrapper">
     <div class="container">
-        <form class="newBookForm" action="/admin/api/v1" method="post">
+        <form class="newBookForm" action="/api/v1/books" method="post">
             <div class="row">
                 <div class="col-xs-7 formFields">
                     <input type="text" name="title" class="form-control" placeholder="Book Title">

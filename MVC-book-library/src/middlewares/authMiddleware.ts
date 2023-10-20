@@ -1,7 +1,7 @@
 import {db} from '../db/dbConnection';
 import {Request, Response, NextFunction} from 'express'
 
-const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+const auth = async (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.header('authorization');
 
     if (!authHeader) {
@@ -38,4 +38,4 @@ const authMiddleware = async (req: Request, res: Response, next: NextFunction) =
     }
 }
 
-export default authMiddleware;
+export default auth;

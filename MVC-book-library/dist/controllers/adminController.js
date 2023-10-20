@@ -9,29 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteOneBook = exports.createOneBook = exports.getAllBooks = void 0;
-const dbConnection_1 = require("../db/dbConnection");
-const getAllBooks = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const result = dbConnection_1.db.query("SELECT * FROM book_library.books", function (err, result, fields) {
-            if (err) {
-                throw err;
-            }
-            let booksData = JSON.parse(JSON.stringify(result));
-            res.status(200).json({ data: { books: booksData, } });
-        });
-    }
-    catch (err) {
-        console.log(err);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
+exports.logout = void 0;
+const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    res.status(200).json({ success: true });
 });
-exports.getAllBooks = getAllBooks;
-const deleteOneBook = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-});
-exports.deleteOneBook = deleteOneBook;
-const createOneBook = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(req.body);
-    res.status(200).redirect('/admin/');
-});
-exports.createOneBook = createOneBook;
+exports.logout = logout;

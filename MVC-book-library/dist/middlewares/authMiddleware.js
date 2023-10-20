@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const dbConnection_1 = require("../db/dbConnection");
-const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const auth = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const authHeader = req.header('authorization');
     if (!authHeader) {
         res.setHeader('WWW-Authenticate', 'Basic realm=""');
@@ -40,4 +40,4 @@ const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
-exports.default = authMiddleware;
+exports.default = auth;

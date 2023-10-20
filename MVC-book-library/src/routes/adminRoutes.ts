@@ -1,9 +1,7 @@
-import express from 'express';
-import auth from '../middlewares/authMiddleware';
-import {getAllBooks, createOneBook, deleteOneBook} from '../controllers/adminController';
+import express, {} from 'express';
+import {logout} from '../controllers/adminController';
 
 const router = express.Router();
-
-router.route('/').post(auth, createOneBook);
+router.route('/logout').get(logout);
 
 export default router;

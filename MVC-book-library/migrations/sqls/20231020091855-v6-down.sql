@@ -1,0 +1,1 @@
+ADD COLUMN `author` VARCHAR(45) NOT NULL AFTER `description`;
