@@ -62,6 +62,28 @@
             border-radius: 4px;
             margin: 0px;
         }
+
+        tbody * {
+            vertical-align: middle !important;
+        }
+
+        .bookName {
+            display: flex;
+            align-items: center;
+        }
+
+        .bookName img {
+            width: 50px;
+            height: 72px;
+            margin-right: 20px;
+        }
+
+        .buttonsContainer {
+            padding: 0 40px;
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
     </style>
 </head>
 
@@ -73,7 +95,7 @@
                 <div class="logo"><a href="http://localhost:3000/" class="navbar-brand"><span class="sh">Ш</span><span
                         class="plus">++</span></a></div>
             </div>
-            <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+            <div class="col-xs-12 col-sm-7 col-md-7 col-lg-8">
                 <div class="main-menu">
                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                         <form class="navbar-form navbar-right">
@@ -95,7 +117,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xs-2 col-sm-3 col-md-2 col-lg-2 hidden-xs">
+            <div class="col-xs-2 col-sm-3 col-md-3 col-lg-2 hidden-xs">
                 <div class="social">
                     <button class="btn btn-success logoutElement">Logout</button>
                     <script>
@@ -119,7 +141,7 @@
 </section>
 <section id="main" class="main-wrapper">
     <div class="container">
-        <form class="newBookForm" action="/api/v1/books" method="post">
+        <form class="newBookForm" action="/api/v1/books" method="post" enctype="multipart/form-data">
             <div class="row">
                 <div class="col-xs-7 formFields">
                     <input type="text" name="title" class="form-control" placeholder="Book Title">
@@ -148,6 +170,27 @@
                 <button type="submit" class="btn btn-lg btn-success addNewBookButton">Add new book</button>
             </div>
         </form>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Book Name</th>
+                    <th>Authors</th>
+                    <th>Year</th>
+                    <th>Action</th>
+                    <th>Clicks</th>
+                </tr>
+                </thead>
+                <tbody id="content"></tbody>
+            </table>
+        </div>
+    </div>
+    <div class="container">
+        <div class="buttonsContainer">
+            <button class="less btn btn-success">Less</button>
+            <button class="more btn btn-success">More</button>
+        </div>
     </div>
 </section>
 <section id="footer" class="footer-wrapper">
@@ -195,5 +238,7 @@
         <p>Not valid!</p>
     </div>
 </div>
+<script src="./admin-page_files/index.js"></script>
+<script src="./admin-page_files/common.js"></script>
 </body>
 </html>

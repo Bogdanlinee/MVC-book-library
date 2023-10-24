@@ -19,6 +19,7 @@ app.use(express.urlencoded({extended: true}));
 app.use('/', express.static('public/books-page'));
 app.use('/book/:id', express.static('public/book-page'));
 app.use('/admin', auth, express.static('public/admin-page'));
+app.use('/images', express.static('public/images'));
 
 app.use('/api/v1/books', booksRouter);
 app.use('/admin/api/v1', adminRouter);

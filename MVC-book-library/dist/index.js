@@ -29,6 +29,7 @@ app.use(express_1.default.urlencoded({ extended: true }));
 app.use('/', express_1.default.static('public/books-page'));
 app.use('/book/:id', express_1.default.static('public/book-page'));
 app.use('/admin', authMiddleware_1.default, express_1.default.static('public/admin-page'));
+app.use('/images', express_1.default.static('public/images'));
 app.use('/api/v1/books', booksRoutes_1.default);
 app.use('/admin/api/v1', adminRoutes_1.default);
 app.listen(port, () => __awaiter(void 0, void 0, void 0, function* () {

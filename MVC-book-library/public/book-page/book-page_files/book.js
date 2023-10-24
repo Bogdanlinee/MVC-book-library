@@ -1,6 +1,5 @@
 var pathname = $(location).attr('pathname');
 var bookIdPosition = pathname.split('/')[2];
-console.log(bookIdPosition);
 var isBookInUse = false;
 var bookId;
 
