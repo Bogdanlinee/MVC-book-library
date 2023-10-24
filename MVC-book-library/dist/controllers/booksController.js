@@ -12,33 +12,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createOneBook = exports.getBook = exports.getAllBooks = void 0;
+exports.deleteOneBook = exports.createOneBook = exports.getBook = exports.getAllBooks = void 0;
 const promises_1 = require("node:fs/promises");
 const path_1 = __importDefault(require("path"));
 const dbQueries_1 = require("../db/dbQueries");
 const getAllBooks = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { limit, offset } = req.query;
-    let limitValue;
-    let offsetValue;
-    if (limit && typeof limit === 'string') {
-        limitValue = parseInt(limit);
-    }
-    else {
-        limitValue = 20;
-    }
-    if (offset && typeof offset === 'string') {
-        offsetValue = parseInt(offset);
-    }
-    else {
-        offsetValue = 0;
-    }
+    const limitValue = limit && typeof limit === 'string' ? parseInt(limit) : 20;
+    const offsetValue = offset && typeof offset === 'string' ? parseInt(offset) : 0;
     try {
         const booksRequest = yield (0, dbQueries_1.getAllBooksQuery)(limitValue, offsetValue);
         const booksData = JSON.parse(JSON.stringify(booksRequest));
         const booksQuantityRequest = yield (0, dbQueries_1.getBooksQuantity)();
         const booksQuantityData = JSON.parse(JSON.stringify(booksQuantityRequest));
         for (const book of booksData) {
-            book.author = yield findBookAuthors(book.id);
+            book.author = yield getBookAuthors(book.id);
         }
         res.status(200).json({
             data: {
@@ -63,7 +51,7 @@ const getBook = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         if (bookData.length === 0) {
             return res.status(400).json({ error: 'No book with such id.', });
         }
-        bookData[0].author = yield findBookAuthors(bookId);
+        bookData[0].author = yield getBookAuthors(bookId);
         res.status(200).json({ data: bookData[0], });
     }
     catch (err) {
@@ -100,6 +88,27 @@ const createOneBook = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.createOneBook = createOneBook;
+const deleteOneBook = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const bookId = parseInt(id);
+    try {
+        const bookRequest = yield (0, dbQueries_1.getOneBookQuery)(bookId);
+        const bookData = JSON.parse(JSON.stringify(bookRequest));
+        console.log(bookId);
+        console.log(bookData);
+        return res.status(500).json({ error: 'Internal Server Error' });
+        if (bookData.length === 0) {
+            return res.status(400).json({ error: 'No book with such id.', });
+        }
+        bookData[0].author = yield getBookAuthors(bookId);
+        res.status(200).json({ data: bookData[0], });
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+exports.deleteOneBook = deleteOneBook;
 const addAuthorToList = (acc, item) => {
     const nameSurname = item.split(/\s+/);
     for (let i = 0; i < nameSurname.length; i++) {
@@ -128,7 +137,7 @@ const createListOfBookAuthors = (authorList) => __awaiter(void 0, void 0, void 0
     }
     return result;
 });
-const findBookAuthors = (bookId) => __awaiter(void 0, void 0, void 0, function* () {
+const getBookAuthors = (bookId) => __awaiter(void 0, void 0, void 0, function* () {
     const bookAuthorsRequest = yield (0, dbQueries_1.getBookAuthorsQuery)(bookId);
     const bookAuthorsData = JSON.parse(JSON.stringify(bookAuthorsRequest));
     const authorsList = bookAuthorsData.reduce((acc, item, index) => {

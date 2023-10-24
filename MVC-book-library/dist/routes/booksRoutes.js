@@ -19,5 +19,5 @@ const storage = multer_1.default.diskStorage({
 const upload = (0, multer_1.default)({ storage: storage });
 router.route('/').get(booksController_1.getAllBooks);
 router.route('/').post(authMiddleware_1.default, upload.single('image'), booksController_1.createOneBook);
-router.route('/:id').get(booksController_1.getBook);
+router.route('/:id/remove').get(booksController_1.deleteOneBook);
 exports.default = router;

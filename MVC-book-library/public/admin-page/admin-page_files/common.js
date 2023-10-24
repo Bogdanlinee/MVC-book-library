@@ -41,18 +41,16 @@ var view = {
         view.hideElement('.glyphicon-remove');
         view.showElement('.glyphicon-ok');
     }, addBookItem: function (book, i) {
-        var newElement = $('<tr> ')
+        var newElement = $('<tr>')
             .append($('<th>').text(parseInt(i) + 1))
             .append($('<td>')
                 .html(`<a class="bookName" href="http://localhost:3000/book/${book.id}">
                         <img src="../images/${book.id}.jpg" alt="${book.title}">
                         <div data-title="${book.title}">${book.title}</div>
-                       </a>
-            `)
-            )
+                       </a>`))
             .append($('<td>').text(book.author))
             .append($('<td>').text(book.year))
-            .append($('<td>').text('Delete button'))
+            .append($('<td>').html(`<button data-id=${book.id} class="btn btn-danger deleteBookButton" type="button">Delete</button>`))
             .append($('<td>').text('Clicks'));
         return newElement.prop('outerHTML');
     }, addBooksItems: function (books, doClean) {
@@ -114,10 +112,9 @@ var view = {
     }, addPopUpBlock: function (title, text) {
         $('#main').after('<div id="test-modal" class="mfp-hide white-popup-block"><h1>' + title + '</h1><p>' + text + '</p><p><a class="popup-modal-dismiss" href="#">X</a></p></div>');
     }, showError: function (text) {
-        swal('Ооопс!', text, 'error');
+        Swal.fire('Ооопс!', text, 'error');
     }, showSuccess: function (text) {
-        // console.log(text);
-        swal('Отлично!', text, 'success');
+        Swal.fire('Отлично!', text, 'success');
     }, showSubscribe: function (text, bookId) {
         swal({
             title: 'Хотите почитать?',
@@ -144,7 +141,7 @@ var view = {
             });
         });
     }, showConfirm: function (bookId) {
-        swal({
+        Swal.fire({
             title: 'Вы уверены?',
             text: 'Согласие приведет к невозвратимому удалению книги',
             type: 'warning',
@@ -153,15 +150,19 @@ var view = {
             confirmButtonColor: '#27AE60',
             confirmButtonText: 'Да, уверен!',
             closeOnConfirm: false
-        }, function () {
-            doAjaxQuery('GET', '/admin/api/v1/books/' + bookId + '/remove', null, function (res) {
-                swal({
+        }).then((willSubmit) => {
+            if (!willSubmit.isConfirmed) {
+                return;
+            }
+
+            doAjaxQuery('GET', '/api/v1/books/' + bookId + '/remove', null, function (res) {
+                Swal.fire({
                     title: 'Удалено!', text: 'Надеюсь, вы осознаете что сейчас произошло ))', type: 'success'
                 }, function () {
                     window.location.href = '/admin';
                 });
             });
-        });
+        })
     }, addMiniItemSearch: function (pathUrl, book) {
         var id = (book.id == 'no-cover') ? '#not_found' : '#miniItem';
         return $(id).html()
@@ -214,7 +215,7 @@ function doAjaxQuery(method, url, data, callback) {
         data: ((method == 'POST') ? JSON.stringify(data) : data),
         success: function (res) {
             if (!res.success) {
-                view.showError(res.msg);
+                view.showSuccess(res.msg);
                 return;
             }
             callback(res);

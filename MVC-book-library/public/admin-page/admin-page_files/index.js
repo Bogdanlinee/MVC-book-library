@@ -76,10 +76,17 @@ document.addEventListener('click', function (e) {
     if (element.closest('.less')) {
         window.items_offset_on_page_load -= window.items_limit_on_page_load;
         addBookListOnThePage();
+        return;
     }
     if (element.closest('.more')) {
         window.items_offset_on_page_load += window.items_limit_on_page_load;
         addBookListOnThePage();
+        return;
+    }
+    if (element.classList.contains('deleteBookButton')) {
+        var bookId = parseInt(element.dataset.id);
+        view.showConfirm(bookId);
+        //method, url, data, callback
     }
 });
 
@@ -104,3 +111,6 @@ function addBookListOnThePage() {
         }
     });
 };
+
+function deleteBook() {
+}

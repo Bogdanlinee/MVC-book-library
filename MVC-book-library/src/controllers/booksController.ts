@@ -16,22 +16,8 @@ type AuthorListItem = { [name: string]: string };
 
 const getAllBooks = async (req: Request, res: Response) => {
     const {limit, offset} = req.query;
-
-    let limitValue;
-    let offsetValue;
-
-    if (limit && typeof limit === 'string') {
-        limitValue = parseInt(limit);
-    } else {
-        limitValue = 20;
-    }
-
-    if (offset && typeof offset === 'string') {
-        offsetValue = parseInt(offset);
-    } else {
-        offsetValue = 0;
-    }
-
+    const limitValue = limit && typeof limit === 'string' ? parseInt(limit) : 20;
+    const offsetValue = offset && typeof offset === 'string' ? parseInt(offset) : 0;
 
     try {
         const booksRequest = await getAllBooksQuery(limitValue, offsetValue);
@@ -40,7 +26,7 @@ const getAllBooks = async (req: Request, res: Response) => {
         const booksQuantityData = JSON.parse(JSON.stringify(booksQuantityRequest));
 
         for (const book of booksData) {
-            book.author = await findBookAuthors(book.id);
+            book.author = await getBookAuthors(book.id);
         }
 
         res.status(200).json({
@@ -68,7 +54,7 @@ const getBook = async (req: Request, res: Response) => {
             return res.status(400).json({error: 'No book with such id.',});
         }
 
-        bookData[0].author = await findBookAuthors(bookId);
+        bookData[0].author = await getBookAuthors(bookId);
 
         res.status(200).json({data: bookData[0],});
     } catch (err) {
@@ -104,6 +90,31 @@ const createOneBook = async (req: Request, res: Response) => {
         }
 
         res.status(200).redirect('/admin');
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({error: 'Internal Server Error'});
+    }
+}
+const deleteOneBook = async (req: Request, res: Response) => {
+    const {id} = req.params;
+    const bookId = parseInt(id);
+
+    try {
+        const bookRequest = await getOneBookQuery(bookId);
+        const bookData = JSON.parse(JSON.stringify(bookRequest));
+
+        console.log(bookId);
+        console.log(bookData);
+
+        return res.status(500).json({error: 'Internal Server Error'});
+        
+        if (bookData.length === 0) {
+            return res.status(400).json({error: 'No book with such id.',});
+        }
+
+        bookData[0].author = await getBookAuthors(bookId);
+
+        res.status(200).json({data: bookData[0],});
     } catch (err) {
         console.log(err);
         res.status(500).json({error: 'Internal Server Error'});
@@ -145,7 +156,7 @@ const createListOfBookAuthors = async (authorList: string[]) => {
     return result;
 }
 
-const findBookAuthors = async (bookId: number) => {
+const getBookAuthors = async (bookId: number) => {
     const bookAuthorsRequest = await getBookAuthorsQuery(bookId);
     const bookAuthorsData = JSON.parse(JSON.stringify(bookAuthorsRequest));
     const authorsList = bookAuthorsData.reduce((acc: string, item: AuthorListItem, index: number) => {
@@ -159,4 +170,4 @@ const findBookAuthors = async (bookId: number) => {
     return authorsList;
 }
 
-export {getAllBooks, getBook, createOneBook};
+export {getAllBooks, getBook, createOneBook, deleteOneBook};
