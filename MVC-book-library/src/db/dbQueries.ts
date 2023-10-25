@@ -7,13 +7,19 @@ const getOneBookQuery = (bookId: number) => {
 }
 
 const getAllBooksQuery = (limit: number, offset: number) => {
+    console.log(limit, offset)
     const queryString = `SELECT * FROM book_library.books LIMIT ${limit} OFFSET ${offset}`;
+    return promise(queryString);
+}
+
+const getBooksQuantity = () => {
+    const queryString = `SELECT COUNT(*) AS count FROM book_library.books;`;
     return promise(queryString);
 }
 
 const getBookAuthorsQuery = (bookId: number) => {
     const queryString = `
-        SELECT authors.name
+        SELECT authors.name, authors.id
         from authors
         join authors_books on authors.id = authors_books.author_id
         where authors_books.book_id = ${bookId}`;
@@ -25,21 +31,31 @@ const getOneAuthorQuery = (authorName: string) => {
 }
 
 const addOneAuthorQuery = (authorName: string) => {
-    const queryString = "INSERT INTO `book_library`.`authors` (`name`) VALUES ('" + authorName + "');";
+    const queryString = `INSERT INTO book_library.authors (name) VALUES ('${authorName}');`;
     return promise(queryString);
 }
 
 const addOneBookQuery = (title: string, year: string, description: string) => {
-    // const queryString = "INSERT INTO `book_library`.`books` (`title`, `year`, `description`) VALUES (" + "'" + title + "'," + "'" + year + "'," + "'" + description + "'" + ");";
-
-
-    const query = "INSERT INTO `book_library`.`books` (`title`, `year`, `description`) VALUES (?, ?, ?)";
-
-
+    const query = `INSERT INTO book_library.books (title, year, description) VALUES (?, ?, ?)`;
     return promise(query, [title, year, description]);
 }
-const getBooksQuantity = () => {
-    const queryString = "SELECT COUNT(*) AS count FROM `book_library`.`books`;";
+
+const deleteBook = (bookId: number) => {
+    const queryString = `DELETE FROM book_library.books WHERE id=${bookId};`;
+    return promise(queryString);
+}
+
+const getAuthorBooks = (authorId: number) => {
+    const queryString = `SELECT * FROM book_library.authors_books WHERE author_id=${authorId};`;
+    return promise(queryString);
+}
+const deleteAuthor = (authorId: number) => {
+    const queryString = `DELETE FROM book_library.authors WHERE id=${authorId};`;
+    return promise(queryString);
+}
+
+const deleteBookConnections = (bookId: number) => {
+    const queryString = `DELETE FROM book_library.authors_books WHERE book_id=${bookId};`;
     return promise(queryString);
 }
 
@@ -54,7 +70,7 @@ const addBookAuthorRelationsQuery = (bookId: number, bookAuthors: number[]) => {
         valuesToAdd += `(${bookId}, ${bookAuthors[author]}), `;
     }
 
-    const queryString = "INSERT INTO book_library.authors_books (book_id, author_id) VALUES " + valuesToAdd + ";";
+    const queryString = `INSERT INTO book_library.authors_books (book_id, author_id) VALUES ${valuesToAdd};`;
     return promise(queryString)
 }
 
@@ -89,4 +105,8 @@ export {
     addOneBookQuery,
     addBookAuthorRelationsQuery,
     getBooksQuantity,
+    deleteBook,
+    deleteBookConnections,
+    deleteAuthor,
+    getAuthorBooks
 }

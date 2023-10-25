@@ -18,6 +18,7 @@ const upload = multer({storage: storage});
 
 router.route('/').get(getAllBooks);
 router.route('/').post(auth, upload.single('image'), createOneBook);
-router.route('/:id/remove').get(deleteOneBook);
+router.route('/:id').get(getBook);
+router.route('/:id/remove').get(auth, deleteOneBook);
 
 export default router;

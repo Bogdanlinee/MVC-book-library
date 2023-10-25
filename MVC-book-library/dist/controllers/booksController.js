@@ -21,10 +21,12 @@ const getAllBooks = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     const limitValue = limit && typeof limit === 'string' ? parseInt(limit) : 20;
     const offsetValue = offset && typeof offset === 'string' ? parseInt(offset) : 0;
     try {
-        const booksRequest = yield (0, dbQueries_1.getAllBooksQuery)(limitValue, offsetValue);
-        const booksData = JSON.parse(JSON.stringify(booksRequest));
-        const booksQuantityRequest = yield (0, dbQueries_1.getBooksQuantity)();
-        const booksQuantityData = JSON.parse(JSON.stringify(booksQuantityRequest));
+        // const booksRequest = await getAllBooksQuery(limitValue, offsetValue);
+        // const booksData = JSON.parse(JSON.stringify(booksRequest));
+        // const booksQuantityRequest = await getBooksQuantity();
+        // const booksQuantityData = JSON.parse(JSON.stringify(booksQuantityRequest));
+        const booksData = yield handleQueryResult(dbQueries_1.getAllBooksQuery, limitValue, offsetValue);
+        const booksQuantityData = yield handleQueryResult(dbQueries_1.getBooksQuantity);
         for (const book of booksData) {
             book.author = yield getBookAuthors(book.id);
         }
@@ -46,8 +48,9 @@ const getBook = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const bookId = parseInt(id);
     try {
-        const bookRequest = yield (0, dbQueries_1.getOneBookQuery)(bookId);
-        const bookData = JSON.parse(JSON.stringify(bookRequest));
+        // const bookRequest = await getOneBookQuery(bookId);
+        // const bookData = JSON.parse(JSON.stringify(bookRequest));
+        const bookData = yield handleQueryResult(dbQueries_1.getOneBookQuery, bookId);
         if (bookData.length === 0) {
             return res.status(400).json({ error: 'No book with such id.', });
         }
@@ -71,9 +74,10 @@ const createOneBook = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             return res.status(400).json({ error: 'Not enough info to create new book' });
         }
         const authorIdsForNewBook = yield createListOfBookAuthors(authorList);
-        const addedBook = yield (0, dbQueries_1.addOneBookQuery)(title, year, description);
-        const newBookId = JSON.parse(JSON.stringify(addedBook)).insertId;
-        yield (0, dbQueries_1.addBookAuthorRelationsQuery)(newBookId, authorIdsForNewBook);
+        // const addedBook = await addOneBookQuery(title, year, description);
+        // const newBookId = JSON.parse(JSON.stringify(addedBook)).insertId;
+        const newBookId = yield handleQueryResult(dbQueries_1.addOneBookQuery, title, year, description);
+        yield (0, dbQueries_1.addBookAuthorRelationsQuery)(newBookId.insertId, authorIdsForNewBook);
         if (req.file) {
             const fileToCopy = path_1.default.join(__dirname, '..', '../uploads/', req.file.filename);
             const fileDestination = path_1.default.join(__dirname, '..', '../public/images/', newBookId + path_1.default.extname(req.file.filename));
@@ -92,16 +96,29 @@ const deleteOneBook = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     const { id } = req.params;
     const bookId = parseInt(id);
     try {
-        const bookRequest = yield (0, dbQueries_1.getOneBookQuery)(bookId);
-        const bookData = JSON.parse(JSON.stringify(bookRequest));
-        console.log(bookId);
-        console.log(bookData);
-        return res.status(500).json({ error: 'Internal Server Error' });
+        // const bookRequest = await getOneBookQuery(bookId);
+        // const bookData = JSON.parse(JSON.stringify(bookRequest));
+        const bookData = yield handleQueryResult(dbQueries_1.getOneBookQuery, bookId);
         if (bookData.length === 0) {
             return res.status(400).json({ error: 'No book with such id.', });
         }
-        bookData[0].author = yield getBookAuthors(bookId);
-        res.status(200).json({ data: bookData[0], });
+        // const bookAuthorsRequest = await getBookAuthorsQuery(bookId);
+        // const bookAuthorsData = JSON.parse(JSON.stringify(bookAuthorsRequest));
+        const bookAuthorsData = yield handleQueryResult(dbQueries_1.getBookAuthorsQuery, bookId);
+        // delete data from the book table
+        yield (0, dbQueries_1.deleteBook)(bookId);
+        // delete data from the connections
+        yield (0, dbQueries_1.deleteBookConnections)(bookId);
+        // delete data from the authors if connections does not have book id
+        for (const authorData of bookAuthorsData) {
+            // const authorHasBooksRequest = await getAuthorBooks(authorData.id);
+            // const authorHasBooksData = JSON.parse(JSON.stringify(authorHasBooksRequest));
+            const authorHasBooksData = yield handleQueryResult(dbQueries_1.getAuthorBooks, authorData.id);
+            if (authorHasBooksData.length === 0) {
+                yield (0, dbQueries_1.deleteAuthor)(authorData.id);
+            }
+        }
+        return res.status(200).json({ data: 'success', });
     }
     catch (err) {
         console.log(err);
@@ -123,23 +140,26 @@ const addAuthorToList = (acc, item) => {
 const createListOfBookAuthors = (authorList) => __awaiter(void 0, void 0, void 0, function* () {
     const result = [];
     for (const author of authorList) {
-        const isAuthorExistResponse = yield (0, dbQueries_1.getOneAuthorQuery)(author);
-        const isAuthorExist = JSON.parse(JSON.stringify(isAuthorExistResponse));
+        // const isAuthorExistResponse = await getOneAuthorQuery(author);
+        // const isAuthorExist = JSON.parse(JSON.stringify(isAuthorExistResponse));
+        const isAuthorExist = yield handleQueryResult(dbQueries_1.getOneAuthorQuery, author);
         if (isAuthorExist.length !== 0) {
             result.push(isAuthorExist[0].id);
             continue;
         }
         else {
-            const addedAuthor = yield (0, dbQueries_1.addOneAuthorQuery)(author);
-            const newAuthorId = JSON.parse(JSON.stringify(addedAuthor)).insertId;
-            result.push(newAuthorId);
+            // const addedAuthor = await addOneAuthorQuery(author);
+            // const newAuthorId = JSON.parse(JSON.stringify(addedAuthor)).insertId;
+            const newAuthorId = yield handleQueryResult(dbQueries_1.addOneAuthorQuery, author);
+            result.push(newAuthorId.insertId);
         }
     }
     return result;
 });
 const getBookAuthors = (bookId) => __awaiter(void 0, void 0, void 0, function* () {
-    const bookAuthorsRequest = yield (0, dbQueries_1.getBookAuthorsQuery)(bookId);
-    const bookAuthorsData = JSON.parse(JSON.stringify(bookAuthorsRequest));
+    // const bookAuthorsRequest = await getBookAuthorsQuery(bookId);
+    // const bookAuthorsData = JSON.parse(JSON.stringify(bookAuthorsRequest));
+    const bookAuthorsData = yield handleQueryResult(dbQueries_1.getBookAuthorsQuery, bookId);
     const authorsList = bookAuthorsData.reduce((acc, item, index) => {
         if (bookAuthorsData.length - 1 === index) {
             acc += item.name;
@@ -149,4 +169,8 @@ const getBookAuthors = (bookId) => __awaiter(void 0, void 0, void 0, function* (
         return acc;
     }, '');
     return authorsList;
+});
+const handleQueryResult = (callback, ...args) => __awaiter(void 0, void 0, void 0, function* () {
+    const queryResult = yield callback(...args);
+    return JSON.parse(JSON.stringify(queryResult));
 });
