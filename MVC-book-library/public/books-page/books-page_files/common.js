@@ -64,7 +64,7 @@ var view = {
         }
 
         content.html(contentHTML);
-        $('.blockI').matchHeight(); // Aligns all the height of the book
+        //$('.blockI').matchHeight();  Aligns all the height of the book
     }, showNot_found: function (searchText, pathUrl) {
         var contentNotFound = $('#not_found').html()
             .replace(/{searchText}/g, searchText);
@@ -114,10 +114,11 @@ var view = {
     }, addPopUpBlock: function (title, text) {
         $('#main').after('<div id="test-modal" class="mfp-hide white-popup-block"><h1>' + title + '</h1><p>' + text + '</p><p><a class="popup-modal-dismiss" href="#">X</a></p></div>');
     }, showError: function (text) {
-        swal('Ооопс!', text, 'error');
-    }, showSuccess: function (text) {
-        // console.log(text);
-        swal('Отлично!', text, 'success');
+        Swal.fire('Ооопс!', text, 'error');
+    }, showSuccess: function (text, callback) {
+        Swal.fire('Отлично!', text, 'success').then((willSubmit) => {
+            callback()
+        });
     }, showSubscribe: function (text, bookId) {
         swal({
             title: 'Хотите почитать?',
@@ -144,7 +145,7 @@ var view = {
             });
         });
     }, showConfirm: function (bookId) {
-        swal({
+        Swal.fire({
             title: 'Вы уверены?',
             text: 'Согласие приведет к невозвратимому удалению книги',
             type: 'warning',
@@ -153,15 +154,15 @@ var view = {
             confirmButtonColor: '#27AE60',
             confirmButtonText: 'Да, уверен!',
             closeOnConfirm: false
-        }, function () {
-            doAjaxQuery('GET', '/admin/api/v1/books/' + bookId + '/remove', null, function (res) {
-                swal({
-                    title: 'Удалено!', text: 'Надеюсь, вы осознаете что сейчас произошло ))', type: 'success'
-                }, function () {
-                    window.location.href = '/admin';
-                });
+        }).then((willSubmit) => {
+            if (!willSubmit.isConfirmed) {
+                return;
+            }
+
+            doAjaxQuery('GET', '/api/v1/books/' + bookId + '/remove', null, function (res) {
+                window.location.href = '/admin';
             });
-        });
+        })
     }, addMiniItemSearch: function (pathUrl, book) {
         var id = (book.id == 'no-cover') ? '#not_found' : '#miniItem';
         return $(id).html()
@@ -214,10 +215,9 @@ function doAjaxQuery(method, url, data, callback) {
         data: ((method == 'POST') ? JSON.stringify(data) : data),
         success: function (res) {
             if (!res.success) {
-                view.showError(res.msg);
+                view.showSuccess(res.msg, callback);
                 return;
             }
-            callback(res);
         },
         error: function (jqXHR, textStatus) {
             view.showError('Ошибка ' + textStatus);

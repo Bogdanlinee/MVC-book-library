@@ -32,6 +32,7 @@ app.use('/admin', authMiddleware_1.default, express_1.default.static('public/adm
 app.use('/images', express_1.default.static('public/images'));
 app.use('/api/v1/books', booksRoutes_1.default);
 app.use('/admin/api/v1', adminRoutes_1.default);
+app.use('/api/v1/conversion', booksRoutes_1.default);
 app.listen(port, () => __awaiter(void 0, void 0, void 0, function* () {
     if (!process.env.MYSQL_CONNECTION) {
         throw new Error('No db credentials');

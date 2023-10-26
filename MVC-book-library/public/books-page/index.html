@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css"
           crossorigin="anonymous"/>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="shortcut icon" href="http://localhost:3000/favicon.ico">
     <style>
         .loginButton {
@@ -50,8 +51,7 @@
                                 <script>
                                     $('#search').bind('keypress', function (e) {
                                         if (e.keyCode == 13) {
-                                            e.preventDefault();
-                                            alert('а вот это придется сделать самому. Ваш @rshmelev');
+                                            e.preventDefault()
                                         }
                                     })
                                 </script>
@@ -135,5 +135,6 @@
 </div>
 <script src="./books-page_files/index.js"></script>
 <script src="./books-page_files/common.js"></script>
+<script src="./books-page_files/search.js"></script>
 </body>
 </html>

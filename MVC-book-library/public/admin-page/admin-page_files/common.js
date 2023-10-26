@@ -113,8 +113,10 @@ var view = {
         $('#main').after('<div id="test-modal" class="mfp-hide white-popup-block"><h1>' + title + '</h1><p>' + text + '</p><p><a class="popup-modal-dismiss" href="#">X</a></p></div>');
     }, showError: function (text) {
         Swal.fire('Ооопс!', text, 'error');
-    }, showSuccess: function (text) {
-        Swal.fire('Отлично!', text, 'success');
+    }, showSuccess: function (text, callback) {
+        Swal.fire('Отлично!', text, 'success').then((willSubmit) => {
+            callback()
+        });
     }, showSubscribe: function (text, bookId) {
         swal({
             title: 'Хотите почитать?',
@@ -156,11 +158,7 @@ var view = {
             }
 
             doAjaxQuery('GET', '/api/v1/books/' + bookId + '/remove', null, function (res) {
-                Swal.fire({
-                    title: 'Удалено!', text: 'Надеюсь, вы осознаете что сейчас произошло ))', type: 'success'
-                }, function () {
-                    window.location.href = '/admin';
-                });
+                window.location.href = '/admin';
             });
         })
     }, addMiniItemSearch: function (pathUrl, book) {
@@ -215,10 +213,9 @@ function doAjaxQuery(method, url, data, callback) {
         data: ((method == 'POST') ? JSON.stringify(data) : data),
         success: function (res) {
             if (!res.success) {
-                view.showSuccess(res.msg);
+                view.showSuccess(res.msg, callback);
                 return;
             }
-            callback(res);
         },
         error: function (jqXHR, textStatus) {
             view.showError('Ошибка ' + textStatus);

@@ -1,7 +1,6 @@
 var drawItemsOnScroll, isScrollRunning = false;
-var items_limit_on_page_load = 20;
+var items_limit_on_page_load = 10;
 var items_offset_on_page_load = 0;
-var items_search_on_page_load = '';
 
 $(document).ready(function () {
     addBookListOnThePage();
@@ -10,39 +9,44 @@ $(document).ready(function () {
         localStorage.setItem('h', $(window).scrollTop());
     });
 
-    // $(document).scroll(function () {
-    //     if ((($(document).height() - $(window).scrollTop()) < (2 * $(window).height())) && !isScrollRunning) {
-    //         isScrollRunning = true;
-    //         drawItemsOnScroll();
-    //     }
-    // });
+    $(document).scroll(function () {
+        if ((($(document).height() - $(window).scrollTop()) < (2 * $(window).height())) && !isScrollRunning) {
+            isScrollRunning = true;
+            drawItemsOnScroll();
+        }
+    });
 });
 
 function getParameterByName(name, url) {
     if (!url) url = $(location).attr('href');
     name = name.replace(/[\[\]]/g, '\\$&');
-    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'), results = regex.exec(url);
+    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+        results = regex.exec(url);
     if (!results) return null;
     if (!results[2]) return '';
     return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
 
 var initDrawItemsOnScroll = function (maxItems) {
-    var maxNumOfItems = maxItems, limit = window.number_of_items_onscroll,
+    var maxNumOfItems = maxItems,
+        limit = window.number_of_items_onscroll,
         offset = parseInt(getParameterByName('count')) || window.items_limit_on_page_load;
 
     return function () {
         if (offset < maxNumOfItems) {
             var data = {
-                'filter': getParameterByName('filter') || 'new', 'limit': limit, 'offset': offset
+                'filter': getParameterByName('filter') || 'new',
+                'limit': limit,
+                'offset': offset
             };
             $('#loading').slideDown();
-            $.ajax('GET', '/api/v1/books', data, function (res) {
-                $('#loading').slideUp();
-                isScrollRunning = false;
-                view.addBooksItems(res.data.books, false);
-                changeHistoryStateWithParams('replace', res.data.filter, res.data.offset);
-            });
+            $.ajax('GET', '/api/v1/books', data,
+                function (res) {
+                    $('#loading').slideUp();
+                    isScrollRunning = false;
+                    view.addBooksItems(res.data.books, false);
+                    changeHistoryStateWithParams('replace', res.data.filter, res.data.offset);
+                });
             offset += limit;
         }
     }
@@ -72,27 +76,34 @@ document.addEventListener('click', function (e) {
     if (element.closest('.less')) {
         window.items_offset_on_page_load -= window.items_limit_on_page_load;
         addBookListOnThePage();
+        return;
     }
     if (element.closest('.more')) {
         window.items_offset_on_page_load += window.items_limit_on_page_load;
         addBookListOnThePage();
+        return;
+    }
+    if (element.classList.contains('deleteBookButton')) {
+        var bookId = parseInt(element.dataset.id);
+        view.showConfirm(bookId);
+        //method, url, data, callback
     }
 });
 
 function addBookListOnThePage() {
     data = {
-        search: getParameterByName('search') || window.items_search_on_page_load,
+        filter: getParameterByName('filter') || 'new',
         limit: getParameterByName('limit') || window.items_limit_on_page_load,
         offset: getParameterByName('offset') || window.items_offset_on_page_load
     };
 
-    // setSidebarActiveButton(null, data.filter);
+    setSidebarActiveButton(null, data.filter);
 
     $.ajax({
         type: 'GET', url: '/api/v1/books', data, success: function (res) {
             view.buttonsVisability(data, res.data.booksOnPageQuantity, res.data.totalBooks);
             view.addBooksItems(res.data.books, true);
-            // drawItemsOnScroll = initDrawItemsOnScroll(res.data.total.amount);
+            drawItemsOnScroll = initDrawItemsOnScroll(res.data.total.amount);
             if (localStorage.getItem('h')) {
                 $(window).scrollTop(localStorage.getItem('h'));
                 localStorage.removeItem('h');

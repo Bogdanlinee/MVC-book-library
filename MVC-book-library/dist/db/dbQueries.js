@@ -7,9 +7,9 @@ const getOneBookQuery = (bookId) => {
     return promise(queryString);
 };
 exports.getOneBookQuery = getOneBookQuery;
-const getAllBooksQuery = (limit, offset) => {
-    console.log(limit, offset);
-    const queryString = `SELECT * FROM book_library.books LIMIT ${limit} OFFSET ${offset}`;
+const getAllBooksQuery = (limit, offset, search) => {
+    const searchString = search ? `WHERE title LIKE '%${search}%'` : ``;
+    const queryString = `SELECT * FROM book_library.books ${searchString} LIMIT ${limit} OFFSET ${offset}`;
     return promise(queryString);
 };
 exports.getAllBooksQuery = getAllBooksQuery;

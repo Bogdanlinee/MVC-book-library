@@ -23,6 +23,7 @@ app.use('/images', express.static('public/images'));
 
 app.use('/api/v1/books', booksRouter);
 app.use('/admin/api/v1', adminRouter);
+app.use('/api/v1/conversion', booksRouter);
 
 app.listen(port, async () => {
     if (!process.env.MYSQL_CONNECTION) {

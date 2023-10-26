@@ -1,0 +1,1 @@
+CREATE TABLE `book_library`.`statistic` AS SELECT id, 0 AS views, 0 AS clicks FROM books;
