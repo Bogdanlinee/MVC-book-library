@@ -27,8 +27,11 @@ const getAllBooks = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const booksQuantityData = yield (0, bookQueriesUtil_1.handleQueryResponse)(dbQueries_1.getBooksQuantity);
         for (const book of booksData) {
             const bookAuthorsData = yield (0, bookQueriesUtil_1.handleQueryResponse)(dbQueries_1.getBookAuthorsQuery, book.id);
+            const bookStatistic = yield (0, bookQueriesUtil_1.handleQueryResponse)(dbQueries_1.getStatsQueries, book.id);
             const authorsString = (0, bookQueriesUtil_1.createStringOfAuthors)(bookAuthorsData);
             book.author = authorsString;
+            book.views = bookStatistic[0].views;
+            book.clicks = bookStatistic[0].clicks;
         }
         res.status(200).json({
             data: {
@@ -82,6 +85,7 @@ const createOneBook = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         const authorIdsForNewBook = yield (0, bookQueriesUtil_1.createListOfBookAuthors)(authorList);
         const newBookId = yield (0, bookQueriesUtil_1.handleQueryResponse)(dbQueries_1.addOneBookQuery, title, year, description);
         yield (0, dbQueries_1.addBookAuthorRelationsQuery)(newBookId.insertId, authorIdsForNewBook);
+        yield (0, dbQueries_1.addBookToStatsTable)(newBookId.insertId);
         if (req.file) {
             const fileToCopy = path_1.default.join(__dirname, '..', '../uploads/', req.file.filename);
             const fileDestination = path_1.default.join(__dirname, '..', '../public/images/', newBookId + path_1.default.extname(req.file.filename));

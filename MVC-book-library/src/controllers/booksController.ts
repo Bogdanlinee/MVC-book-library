@@ -11,7 +11,9 @@ import {
     deleteBook,
     deleteBookConnections,
     deleteAuthor,
-    getAuthorBooks
+    getAuthorBooks,
+    getStatsQueries,
+    addBookToStatsTable
 } from '../db/dbQueries';
 import {
     handleQueryResponse,
@@ -32,8 +34,12 @@ const getAllBooks = async (req: Request, res: Response) => {
 
         for (const book of booksData) {
             const bookAuthorsData = await handleQueryResponse(getBookAuthorsQuery, book.id);
+            const bookStatistic = await handleQueryResponse(getStatsQueries, book.id);
             const authorsString = createStringOfAuthors(bookAuthorsData);
+
             book.author = authorsString;
+            book.views = bookStatistic[0].views;
+            book.clicks = bookStatistic[0].clicks;
         }
 
         res.status(200).json({
@@ -99,6 +105,7 @@ const createOneBook = async (req: Request, res: Response) => {
         const newBookId = await handleQueryResponse(addOneBookQuery, title, year, description);
 
         await addBookAuthorRelationsQuery(newBookId.insertId, authorIdsForNewBook);
+        await addBookToStatsTable(newBookId.insertId);
 
         if (req.file) {
             const fileToCopy = path.join(__dirname, '..', '../uploads/', req.file.filename);

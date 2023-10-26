@@ -10,9 +10,47 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getConversion = exports.changeConversion = void 0;
+const dbQueries_1 = require("../db/dbQueries");
+const bookQueriesUtil_1 = require("../utils/bookQueriesUtil");
 const changeConversion = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    if (!id && !isNaN(parseInt(id))) {
+        return res.status(400).json({ error: 'Provide Book id', });
+    }
+    const bookId = parseInt(id);
+    try {
+        const bookStatistic = (yield (0, bookQueriesUtil_1.handleQueryResponse)(dbQueries_1.getStatsQueries, bookId))[0];
+        if (!bookStatistic) {
+            return res.status(400).json({ error: 'Provide Book id' });
+        }
+        const viewsValue = bookStatistic.views + 1;
+        yield (0, bookQueriesUtil_1.handleQueryResponse)(dbQueries_1.increasePageViews, bookId, viewsValue);
+        res.status(200).json({ success: 'true' });
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
 });
 exports.changeConversion = changeConversion;
 const getConversion = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    if (!id && !isNaN(parseInt(id))) {
+        return res.status(400).json({ error: 'Provide Book id', });
+    }
+    const bookId = parseInt(id);
+    try {
+        const bookStatistic = (yield (0, bookQueriesUtil_1.handleQueryResponse)(dbQueries_1.getStatsQueries, bookId))[0];
+        if (!bookStatistic) {
+            return res.status(400).json({ error: 'Provide Book id' });
+        }
+        const clicksValue = bookStatistic.clicks + 1;
+        yield (0, bookQueriesUtil_1.handleQueryResponse)(dbQueries_1.increasePageClicks, bookId, clicksValue);
+        res.status(200).json({ success: 'true' });
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
 });
 exports.getConversion = getConversion;

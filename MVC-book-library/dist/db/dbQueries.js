@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAuthorBooks = exports.deleteAuthor = exports.deleteBookConnections = exports.deleteBook = exports.getBooksQuantity = exports.addBookAuthorRelationsQuery = exports.addOneBookQuery = exports.addOneAuthorQuery = exports.getOneAuthorQuery = exports.getAllBooksQuery = exports.getOneBookQuery = exports.getBookAuthorsQuery = void 0;
+exports.addBookToStatsTable = exports.increasePageClicks = exports.increasePageViews = exports.getStatsQueries = exports.getAuthorBooks = exports.deleteAuthor = exports.deleteBookConnections = exports.deleteBook = exports.getBooksQuantity = exports.addBookAuthorRelationsQuery = exports.addOneBookQuery = exports.addOneAuthorQuery = exports.getOneAuthorQuery = exports.getAllBooksQuery = exports.getOneBookQuery = exports.getBookAuthorsQuery = void 0;
 const dbConnection_1 = require("../db/dbConnection");
 const getOneBookQuery = (bookId) => {
     const queryString = `SELECT * FROM book_library.books WHERE id=${bookId}`;
@@ -75,6 +75,26 @@ const addBookAuthorRelationsQuery = (bookId, bookAuthors) => {
     return promise(queryString);
 };
 exports.addBookAuthorRelationsQuery = addBookAuthorRelationsQuery;
+const getStatsQueries = (bookId) => {
+    const queryString = `SELECT * FROM book_library.statistic WHERE id=${bookId}`;
+    return promise(queryString);
+};
+exports.getStatsQueries = getStatsQueries;
+const addBookToStatsTable = (bookId) => {
+    const queryString = `INSERT INTO book_library.statistic (id, views, clicks) VALUES (${bookId}, 0, 0);`;
+    return promise(queryString);
+};
+exports.addBookToStatsTable = addBookToStatsTable;
+const increasePageViews = (bookId, viewsValue) => {
+    const queryString = `UPDATE book_library.statistic SET views=${viewsValue} WHERE id=${bookId}`;
+    return promise(queryString);
+};
+exports.increasePageViews = increasePageViews;
+const increasePageClicks = (bookId, clicksValue) => {
+    const queryString = `UPDATE book_library.statistic SET clicks=${clicksValue} WHERE id=${bookId}`;
+    return promise(queryString);
+};
+exports.increasePageClicks = increasePageClicks;
 const promise = (query, args) => {
     if (args) {
         return new Promise((resolve, reject) => {

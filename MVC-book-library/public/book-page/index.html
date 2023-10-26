@@ -190,6 +190,26 @@
         </div>
     </div>
 </div>
+<script>
+    (function () {
+        const bookId = window.location.pathname.replaceAll(/\D/g, '');
+        const wantReadButton = document.querySelector('.btnBookID');
+
+        try {
+            fetch(`/api/v1/conversion/${bookId}`, {method: 'POST'});
+        } catch (err) {
+            console.log(err)
+        }
+
+        try {
+            wantReadButton.addEventListener('click', function () {
+                fetch(`/api/v1/conversion/${bookId}`, {method: 'GET'});
+            });
+        } catch (err) {
+            console.log(err)
+        }
+    })();
+</script>
 </body>
 
 </html>

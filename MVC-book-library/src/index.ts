@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import {connectDB} from './db/dbConnection';
 import booksRouter from './routes/booksRoutes';
 import adminRouter from './routes/adminRoutes';
+import conversionRouter from './routes/conversionRoutes';
 import auth from './middlewares/authMiddleware';
 
 dotenv.config();
@@ -23,7 +24,7 @@ app.use('/images', express.static('public/images'));
 
 app.use('/api/v1/books', booksRouter);
 app.use('/admin/api/v1', adminRouter);
-app.use('/api/v1/conversion', booksRouter);
+app.use('/api/v1/conversion', conversionRouter);
 
 app.listen(port, async () => {
     if (!process.env.MYSQL_CONNECTION) {

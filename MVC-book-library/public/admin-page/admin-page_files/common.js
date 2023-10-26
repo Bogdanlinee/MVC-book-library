@@ -51,7 +51,8 @@ var view = {
             .append($('<td>').text(book.author))
             .append($('<td>').text(book.year))
             .append($('<td>').html(`<button data-id=${book.id} class="btn btn-danger deleteBookButton" type="button">Delete</button>`))
-            .append($('<td>').text('Clicks'));
+            .append($('<td>').text(book.views))
+            .append($('<td>').text(book.clicks));
         return newElement.prop('outerHTML');
     }, addBooksItems: function (books, doClean) {
         var content = $('#content');

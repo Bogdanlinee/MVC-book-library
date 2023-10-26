@@ -75,6 +75,27 @@ const addBookAuthorRelationsQuery = (bookId: number, bookAuthors: number[]) => {
     return promise(queryString)
 }
 
+const getStatsQueries = (bookId: number) => {
+    const queryString = `SELECT * FROM book_library.statistic WHERE id=${bookId}`;
+    return promise(queryString);
+}
+
+const addBookToStatsTable = (bookId: number) => {
+    const queryString = `INSERT INTO book_library.statistic (id, views, clicks) VALUES (${bookId}, 0, 0);`;
+    return promise(queryString);
+}
+
+
+const increasePageViews = (bookId: number, viewsValue: number) => {
+    const queryString = `UPDATE book_library.statistic SET views=${viewsValue} WHERE id=${bookId}`;
+    return promise(queryString);
+}
+
+const increasePageClicks = (bookId: number, clicksValue: number) => {
+    const queryString = `UPDATE book_library.statistic SET clicks=${clicksValue} WHERE id=${bookId}`;
+    return promise(queryString);
+}
+
 const promise = (query: string, args?: string[]) => {
     if (args) {
         return new Promise((resolve, reject) => {
@@ -109,5 +130,9 @@ export {
     deleteBook,
     deleteBookConnections,
     deleteAuthor,
-    getAuthorBooks
+    getAuthorBooks,
+    getStatsQueries,
+    increasePageViews,
+    increasePageClicks,
+    addBookToStatsTable
 }
