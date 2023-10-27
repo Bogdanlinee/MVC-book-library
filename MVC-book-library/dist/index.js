@@ -20,6 +20,7 @@ const booksRoutes_1 = __importDefault(require("./routes/booksRoutes"));
 const adminRoutes_1 = __importDefault(require("./routes/adminRoutes"));
 const conversionRoutes_1 = __importDefault(require("./routes/conversionRoutes"));
 const authMiddleware_1 = __importDefault(require("./middlewares/authMiddleware"));
+const cron_1 = require("./utils/cron");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = 3000;
@@ -35,11 +36,12 @@ app.use('/api/v1/books', booksRoutes_1.default);
 app.use('/admin/api/v1', adminRoutes_1.default);
 app.use('/api/v1/conversion', conversionRoutes_1.default);
 app.listen(port, () => __awaiter(void 0, void 0, void 0, function* () {
-    if (!process.env.MYSQL_CONNECTION) {
-        throw new Error('No db credentials');
-    }
-    (0, dbConnection_1.connectDB)(process.env.MYSQL_CONNECTION);
     try {
+        if (!process.env.MYSQL_CONNECTION) {
+            throw new Error('No db credentials');
+        }
+        (0, dbConnection_1.connectDB)(process.env.MYSQL_CONNECTION);
+        (0, cron_1.cornStart)(process.env.MYSQL_CONNECTION);
     }
     catch (err) {
         console.log(err);

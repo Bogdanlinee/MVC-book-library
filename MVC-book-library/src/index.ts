@@ -6,6 +6,7 @@ import booksRouter from './routes/booksRoutes';
 import adminRouter from './routes/adminRoutes';
 import conversionRouter from './routes/conversionRoutes';
 import auth from './middlewares/authMiddleware';
+import {cornStart} from './utils/cron';
 
 dotenv.config();
 
@@ -27,13 +28,15 @@ app.use('/admin/api/v1', adminRouter);
 app.use('/api/v1/conversion', conversionRouter);
 
 app.listen(port, async () => {
-    if (!process.env.MYSQL_CONNECTION) {
-        throw new Error('No db credentials');
-    }
-    connectDB(process.env.MYSQL_CONNECTION);
     try {
+        if (!process.env.MYSQL_CONNECTION) {
+            throw new Error('No db credentials');
+        }
+        connectDB(process.env.MYSQL_CONNECTION);
+        cornStart(process.env.MYSQL_CONNECTION);
     } catch (err) {
         console.log(err);
     }
     console.log('server is running');
-})
+});
+
