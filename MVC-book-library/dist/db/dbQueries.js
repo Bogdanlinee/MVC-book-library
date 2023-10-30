@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addBookToStatsTable = exports.increasePageClicks = exports.increasePageViews = exports.getStatsQueries = exports.getAuthorBooks = exports.deleteAuthor = exports.deleteBookConnections = exports.deleteBook = exports.getBooksQuantity = exports.addBookAuthorRelationsQuery = exports.addOneBookQuery = exports.addOneAuthorQuery = exports.getOneAuthorQuery = exports.getAllBooksQuery = exports.getOneBookQuery = exports.getBookAuthorsQuery = void 0;
+exports.findBooksNeedToDelete = exports.bookMarkToDelete = exports.addBookToStatsTable = exports.increasePageClicks = exports.increasePageViews = exports.getStatsQueries = exports.getAuthorBooks = exports.deleteAuthor = exports.deleteBookAuthorConnections = exports.deleteBook = exports.getBooksQuantity = exports.addBookAuthorRelationsQuery = exports.addOneBookQuery = exports.addOneAuthorQuery = exports.getOneAuthorQuery = exports.getAllBooksQuery = exports.getOneBookQuery = exports.getBookAuthorsQuery = void 0;
 const dbConnection_1 = require("../db/dbConnection");
 const getOneBookQuery = (bookId) => {
     const queryString = `SELECT * FROM book_library.books WHERE id=${bookId}`;
@@ -57,11 +57,11 @@ const deleteAuthor = (authorId) => {
     return promise(queryString);
 };
 exports.deleteAuthor = deleteAuthor;
-const deleteBookConnections = (bookId) => {
+const deleteBookAuthorConnections = (bookId) => {
     const queryString = `DELETE FROM book_library.authors_books WHERE book_id=${bookId};`;
     return promise(queryString);
 };
-exports.deleteBookConnections = deleteBookConnections;
+exports.deleteBookAuthorConnections = deleteBookAuthorConnections;
 const addBookAuthorRelationsQuery = (bookId, bookAuthors) => {
     let valuesToAdd = '';
     for (let author = 0; author < bookAuthors.length; author++) {
@@ -95,6 +95,16 @@ const increasePageClicks = (bookId, clicksValue) => {
     return promise(queryString);
 };
 exports.increasePageClicks = increasePageClicks;
+const bookMarkToDelete = (bookId) => {
+    const queryString = `UPDATE book_library.books SET deleted='1' WHERE (id=${bookId})`;
+    return promise(queryString);
+};
+exports.bookMarkToDelete = bookMarkToDelete;
+const findBooksNeedToDelete = () => {
+    const queryString = `SELECT * FROM book_library.books WHERE deleted='1';`;
+    return promise(queryString);
+};
+exports.findBooksNeedToDelete = findBooksNeedToDelete;
 const promise = (query, args) => {
     if (args) {
         return new Promise((resolve, reject) => {

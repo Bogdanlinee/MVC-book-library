@@ -88,7 +88,7 @@ const createOneBook = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         yield (0, dbQueries_1.addBookToStatsTable)(newBookId.insertId);
         if (req.file) {
             const fileToCopy = path_1.default.join(__dirname, '..', '../uploads/', req.file.filename);
-            const fileDestination = path_1.default.join(__dirname, '..', '../public/images/', newBookId + path_1.default.extname(req.file.filename));
+            const fileDestination = path_1.default.join(__dirname, '..', '../public/images/', newBookId.insertId + path_1.default.extname(req.file.filename));
             yield (0, promises_1.copyFile)(fileToCopy, fileDestination);
             yield (0, promises_1.unlink)(fileToCopy);
         }
@@ -111,15 +111,7 @@ const deleteOneBook = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         if (bookData.length === 0) {
             return res.status(400).json({ error: 'No book with such id.', });
         }
-        const bookAuthorsData = yield (0, bookQueriesUtil_1.handleQueryResponse)(dbQueries_1.getBookAuthorsQuery, bookId);
-        yield (0, dbQueries_1.deleteBook)(bookId);
-        yield (0, dbQueries_1.deleteBookConnections)(bookId);
-        for (const authorData of bookAuthorsData) {
-            const authorHasBooksData = yield (0, bookQueriesUtil_1.handleQueryResponse)(dbQueries_1.getAuthorBooks, authorData.id);
-            if (authorHasBooksData.length === 0) {
-                yield (0, dbQueries_1.deleteAuthor)(authorData.id);
-            }
-        }
+        yield (0, dbQueries_1.bookMarkToDelete)(bookId);
         return res.status(200).json({ data: 'success', });
     }
     catch (err) {

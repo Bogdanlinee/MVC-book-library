@@ -1,2 +1,2 @@
-ALTER TABLE `book_library`.`books` 
+ALTER TABLE `book_library`.`books`
 DROP COLUMN `author`;

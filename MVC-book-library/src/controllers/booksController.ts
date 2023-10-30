@@ -9,11 +9,12 @@ import {
     addBookAuthorRelationsQuery,
     getBooksQuantity,
     deleteBook,
-    deleteBookConnections,
+    deleteBookAuthorConnections,
     deleteAuthor,
     getAuthorBooks,
     getStatsQueries,
-    addBookToStatsTable
+    addBookToStatsTable,
+    bookMarkToDelete
 } from '../db/dbQueries';
 import {
     handleQueryResponse,
@@ -109,7 +110,7 @@ const createOneBook = async (req: Request, res: Response) => {
 
         if (req.file) {
             const fileToCopy = path.join(__dirname, '..', '../uploads/', req.file.filename);
-            const fileDestination = path.join(__dirname, '..', '../public/images/', newBookId + path.extname(req.file.filename));
+            const fileDestination = path.join(__dirname, '..', '../public/images/', newBookId.insertId + path.extname(req.file.filename));
             await copyFile(fileToCopy, fileDestination);
             await unlink(fileToCopy);
         }
@@ -137,16 +138,7 @@ const deleteOneBook = async (req: Request, res: Response) => {
             return res.status(400).json({error: 'No book with such id.',});
         }
 
-        const bookAuthorsData = await handleQueryResponse(getBookAuthorsQuery, bookId);
-        await deleteBook(bookId);
-        await deleteBookConnections(bookId);
-
-        for (const authorData of bookAuthorsData) {
-            const authorHasBooksData = await handleQueryResponse(getAuthorBooks, authorData.id);
-            if (authorHasBooksData.length === 0) {
-                await deleteAuthor(authorData.id);
-            }
-        }
+        await bookMarkToDelete(bookId);
 
         return res.status(200).json({data: 'success',});
     } catch (err) {

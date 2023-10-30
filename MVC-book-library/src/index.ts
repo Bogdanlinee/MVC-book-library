@@ -17,6 +17,7 @@ app.use(morgan('tiny'))
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
+
 // serve static
 app.use('/', express.static('public/books-page'));
 app.use('/book/:id', express.static('public/book-page'));

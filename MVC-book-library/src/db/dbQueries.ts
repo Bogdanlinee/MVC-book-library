@@ -1,5 +1,4 @@
 import {db} from '../db/dbConnection';
-import auth from '../middlewares/authMiddleware';
 
 const getOneBookQuery = (bookId: number) => {
     const queryString = `SELECT * FROM book_library.books WHERE id=${bookId}`;
@@ -55,7 +54,7 @@ const deleteAuthor = (authorId: number) => {
     return promise(queryString);
 }
 
-const deleteBookConnections = (bookId: number) => {
+const deleteBookAuthorConnections = (bookId: number) => {
     const queryString = `DELETE FROM book_library.authors_books WHERE book_id=${bookId};`;
     return promise(queryString);
 }
@@ -96,6 +95,16 @@ const increasePageClicks = (bookId: number, clicksValue: number) => {
     return promise(queryString);
 }
 
+const bookMarkToDelete = (bookId: number) => {
+    const queryString = `UPDATE book_library.books SET deleted='1' WHERE (id=${bookId})`;
+    return promise(queryString);
+}
+
+const findBooksNeedToDelete = () => {
+    const queryString = `SELECT * FROM book_library.books WHERE deleted='1';`;
+    return promise(queryString);
+}
+
 const promise = (query: string, args?: string[]) => {
     if (args) {
         return new Promise((resolve, reject) => {
@@ -128,11 +137,13 @@ export {
     addBookAuthorRelationsQuery,
     getBooksQuantity,
     deleteBook,
-    deleteBookConnections,
+    deleteBookAuthorConnections,
     deleteAuthor,
     getAuthorBooks,
     getStatsQueries,
     increasePageViews,
     increasePageClicks,
-    addBookToStatsTable
+    addBookToStatsTable,
+    bookMarkToDelete,
+    findBooksNeedToDelete
 }

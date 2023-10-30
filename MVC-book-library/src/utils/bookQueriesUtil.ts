@@ -1,4 +1,13 @@
-import {addOneAuthorQuery, getOneAuthorQuery} from '../db/dbQueries';
+import {
+    addOneAuthorQuery,
+    getOneAuthorQuery,
+    findBooksNeedToDelete,
+    getBookAuthorsQuery,
+    deleteBook,
+    deleteBookAuthorConnections,
+    getAuthorBooks,
+    deleteAuthor
+} from '../db/dbQueries';
 
 type AuthorListItem = { name: string, id: number };
 
@@ -49,9 +58,26 @@ const createListOfBookAuthors = async (authorList: string[]) => {
     return result;
 }
 
+const deleteBookFromDB = async () => {
+    const bookListToDelete = await handleQueryResponse(findBooksNeedToDelete);
+    for (const book of bookListToDelete) {
+        const bookId = book.id;
+        const bookAuthorsData = await handleQueryResponse(getBookAuthorsQuery, bookId);
+        await deleteBook(bookId);
+        await deleteBookAuthorConnections(bookId);
+
+        for (const authorData of bookAuthorsData) {
+            const authorHasBooksData = await handleQueryResponse(getAuthorBooks, authorData.id);
+            if (authorHasBooksData.length === 0) {
+                await deleteAuthor(authorData.id);
+            }
+        }
+    }
+}
 export {
     handleQueryResponse,
     createStringOfAuthors,
     capitalizeAuthorName,
-    createListOfBookAuthors
+    createListOfBookAuthors,
+    deleteBookFromDB
 };

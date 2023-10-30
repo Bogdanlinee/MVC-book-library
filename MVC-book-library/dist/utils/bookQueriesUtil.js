@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createListOfBookAuthors = exports.capitalizeAuthorName = exports.createStringOfAuthors = exports.handleQueryResponse = void 0;
+exports.deleteBookFromDB = exports.createListOfBookAuthors = exports.capitalizeAuthorName = exports.createStringOfAuthors = exports.handleQueryResponse = void 0;
 const dbQueries_1 = require("../db/dbQueries");
 const handleQueryResponse = (callback, ...args) => __awaiter(void 0, void 0, void 0, function* () {
     const queryResult = yield callback(...args);
@@ -52,3 +52,19 @@ const createListOfBookAuthors = (authorList) => __awaiter(void 0, void 0, void 0
     return result;
 });
 exports.createListOfBookAuthors = createListOfBookAuthors;
+const deleteBookFromDB = () => __awaiter(void 0, void 0, void 0, function* () {
+    const bookListToDelete = yield handleQueryResponse(dbQueries_1.findBooksNeedToDelete);
+    for (const book of bookListToDelete) {
+        const bookId = book.id;
+        const bookAuthorsData = yield handleQueryResponse(dbQueries_1.getBookAuthorsQuery, bookId);
+        yield (0, dbQueries_1.deleteBook)(bookId);
+        yield (0, dbQueries_1.deleteBookAuthorConnections)(bookId);
+        for (const authorData of bookAuthorsData) {
+            const authorHasBooksData = yield handleQueryResponse(dbQueries_1.getAuthorBooks, authorData.id);
+            if (authorHasBooksData.length === 0) {
+                yield (0, dbQueries_1.deleteAuthor)(authorData.id);
+            }
+        }
+    }
+});
+exports.deleteBookFromDB = deleteBookFromDB;
