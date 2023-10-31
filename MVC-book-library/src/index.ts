@@ -7,6 +7,8 @@ import adminRouter from './routes/adminRoutes';
 import conversionRouter from './routes/conversionRoutes';
 import auth from './middlewares/authMiddleware';
 import {cornStart} from './utils/cron';
+import runMigrations from './utils/runMigrations';
+
 
 dotenv.config();
 
@@ -34,10 +36,11 @@ app.listen(port, async () => {
             throw new Error('No db credentials');
         }
         connectDB(process.env.MYSQL_CONNECTION);
+        runMigrations();
         cornStart(process.env.MYSQL_CONNECTION);
+        console.log('server is running');
     } catch (err) {
         console.log(err);
     }
-    console.log('server is running');
 });
 

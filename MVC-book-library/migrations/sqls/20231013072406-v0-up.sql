@@ -2,6 +2,8 @@ create TABLE `book_library`.`books` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(100) NOT NULL,
   `author` VARCHAR(200) NOT NULL,
+  `year` VARCHAR(5),
+  `description` VARCHAR(10000),
   PRIMARY KEY (`id`));
 
 -- add books to table

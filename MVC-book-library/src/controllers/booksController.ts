@@ -8,19 +8,16 @@ import {
     addOneBookQuery,
     addBookAuthorRelationsQuery,
     getBooksQuantity,
-    deleteBook,
-    deleteBookAuthorConnections,
-    deleteAuthor,
-    getAuthorBooks,
     getStatsQueries,
     addBookToStatsTable,
-    bookMarkToDelete
+    bookMarkToDelete,
 } from '../db/dbQueries';
 import {
     handleQueryResponse,
     createStringOfAuthors,
     capitalizeAuthorName,
-    createListOfBookAuthors
+    createListOfBookAuthors,
+    escapeHtml,
 } from '../utils/bookQueriesUtil';
 
 const getAllBooks = async (req: Request, res: Response) => {
@@ -103,7 +100,7 @@ const createOneBook = async (req: Request, res: Response) => {
         }
 
         const authorIdsForNewBook = await createListOfBookAuthors(authorList);
-        const newBookId = await handleQueryResponse(addOneBookQuery, title, year, description);
+        const newBookId = await handleQueryResponse(addOneBookQuery, escapeHtml(title), escapeHtml(year), escapeHtml(description));
 
         await addBookAuthorRelationsQuery(newBookId.insertId, authorIdsForNewBook);
         await addBookToStatsTable(newBookId.insertId);

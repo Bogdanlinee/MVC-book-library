@@ -83,7 +83,7 @@ const createOneBook = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             return res.status(400).json({ error: 'Not enough info to create new book' });
         }
         const authorIdsForNewBook = yield (0, bookQueriesUtil_1.createListOfBookAuthors)(authorList);
-        const newBookId = yield (0, bookQueriesUtil_1.handleQueryResponse)(dbQueries_1.addOneBookQuery, title, year, description);
+        const newBookId = yield (0, bookQueriesUtil_1.handleQueryResponse)(dbQueries_1.addOneBookQuery, (0, bookQueriesUtil_1.escapeHtml)(title), (0, bookQueriesUtil_1.escapeHtml)(year), (0, bookQueriesUtil_1.escapeHtml)(description));
         yield (0, dbQueries_1.addBookAuthorRelationsQuery)(newBookId.insertId, authorIdsForNewBook);
         yield (0, dbQueries_1.addBookToStatsTable)(newBookId.insertId);
         if (req.file) {

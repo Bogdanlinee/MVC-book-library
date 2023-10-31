@@ -6,12 +6,12 @@ import {
     deleteBook,
     deleteBookAuthorConnections,
     getAuthorBooks,
-    deleteAuthor
+    deleteAuthor,
+    deleteStatsConnections
 } from '../db/dbQueries';
 
 type AuthorListItem = { name: string, id: number };
-
-const handleQueryResponse = async (callback, ...args: (string | number | null)[]) => {
+const handleQueryResponse = async (callback: any, ...args: (string | number | null)[]) => {
     const queryResult = await callback(...args);
     return JSON.parse(JSON.stringify(queryResult));
 }
@@ -37,7 +37,7 @@ const capitalizeAuthorName = (item: string) => {
         nameSurname[i] = word.charAt(0).toUpperCase() + word.slice(1);
     }
 
-    return nameSurname.join(' ').trim();
+    return escapeHtml(nameSurname.join(' ').trim());
 }
 
 const createListOfBookAuthors = async (authorList: string[]) => {
@@ -50,7 +50,7 @@ const createListOfBookAuthors = async (authorList: string[]) => {
             result.push(isAuthorExist[0].id);
             continue;
         } else {
-            const newAuthorId = await handleQueryResponse(addOneAuthorQuery, author);
+            const newAuthorId = await handleQueryResponse(addOneAuthorQuery, escapeHtml(author));
             result.push(newAuthorId.insertId);
         }
     }
@@ -60,11 +60,14 @@ const createListOfBookAuthors = async (authorList: string[]) => {
 
 const deleteBookFromDB = async () => {
     const bookListToDelete = await handleQueryResponse(findBooksNeedToDelete);
+
     for (const book of bookListToDelete) {
         const bookId = book.id;
         const bookAuthorsData = await handleQueryResponse(getBookAuthorsQuery, bookId);
+
         await deleteBook(bookId);
         await deleteBookAuthorConnections(bookId);
+        await deleteStatsConnections(bookId);
 
         for (const authorData of bookAuthorsData) {
             const authorHasBooksData = await handleQueryResponse(getAuthorBooks, authorData.id);
@@ -74,10 +77,26 @@ const deleteBookFromDB = async () => {
         }
     }
 }
+
+const escapeHtml = (text: string) => {
+    const map: { [key: string]: string } = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+
+    return text.replace(/[&<>"']/g, function (m) {
+        return map[m];
+    });
+}
+
 export {
     handleQueryResponse,
     createStringOfAuthors,
     capitalizeAuthorName,
     createListOfBookAuthors,
-    deleteBookFromDB
+    deleteBookFromDB,
+    escapeHtml
 };

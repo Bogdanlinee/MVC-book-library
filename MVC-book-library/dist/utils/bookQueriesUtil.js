@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteBookFromDB = exports.createListOfBookAuthors = exports.capitalizeAuthorName = exports.createStringOfAuthors = exports.handleQueryResponse = void 0;
+exports.escapeHtml = exports.deleteBookFromDB = exports.createListOfBookAuthors = exports.capitalizeAuthorName = exports.createStringOfAuthors = exports.handleQueryResponse = void 0;
 const dbQueries_1 = require("../db/dbQueries");
 const handleQueryResponse = (callback, ...args) => __awaiter(void 0, void 0, void 0, function* () {
     const queryResult = yield callback(...args);
@@ -33,7 +33,7 @@ const capitalizeAuthorName = (item) => {
         const word = nameSurname[i];
         nameSurname[i] = word.charAt(0).toUpperCase() + word.slice(1);
     }
-    return nameSurname.join(' ').trim();
+    return escapeHtml(nameSurname.join(' ').trim());
 };
 exports.capitalizeAuthorName = capitalizeAuthorName;
 const createListOfBookAuthors = (authorList) => __awaiter(void 0, void 0, void 0, function* () {
@@ -45,7 +45,7 @@ const createListOfBookAuthors = (authorList) => __awaiter(void 0, void 0, void 0
             continue;
         }
         else {
-            const newAuthorId = yield handleQueryResponse(dbQueries_1.addOneAuthorQuery, author);
+            const newAuthorId = yield handleQueryResponse(dbQueries_1.addOneAuthorQuery, escapeHtml(author));
             result.push(newAuthorId.insertId);
         }
     }
@@ -59,6 +59,7 @@ const deleteBookFromDB = () => __awaiter(void 0, void 0, void 0, function* () {
         const bookAuthorsData = yield handleQueryResponse(dbQueries_1.getBookAuthorsQuery, bookId);
         yield (0, dbQueries_1.deleteBook)(bookId);
         yield (0, dbQueries_1.deleteBookAuthorConnections)(bookId);
+        yield (0, dbQueries_1.deleteStatsConnections)(bookId);
         for (const authorData of bookAuthorsData) {
             const authorHasBooksData = yield handleQueryResponse(dbQueries_1.getAuthorBooks, authorData.id);
             if (authorHasBooksData.length === 0) {
@@ -68,3 +69,16 @@ const deleteBookFromDB = () => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.deleteBookFromDB = deleteBookFromDB;
+const escapeHtml = (text) => {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, function (m) {
+        return map[m];
+    });
+};
+exports.escapeHtml = escapeHtml;

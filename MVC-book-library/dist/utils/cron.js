@@ -18,18 +18,18 @@ const dbBackup_1 = require("./dbBackup");
 const child_process_1 = require("child_process");
 const bookQueriesUtil_1 = require("./bookQueriesUtil");
 const task = function (credentials) {
-    return node_cron_1.default.schedule('5 10 * * *', () => __awaiter(this, void 0, void 0, function* () {
+    return node_cron_1.default.schedule('40 15 * * *', () => {
         const commandBackupDB = (0, dbBackup_1.dbBackup)(credentials);
-        (0, child_process_1.exec)(commandBackupDB, (error, stdout, stderr) => {
+        (0, child_process_1.exec)(commandBackupDB, (error, stdout, stderr) => __awaiter(this, void 0, void 0, function* () {
             if (error) {
                 throw Error('Something wrong with cron: ' + error);
             }
             else {
                 console.log('Database backup created successfully');
+                yield (0, bookQueriesUtil_1.deleteBookFromDB)();
             }
-        });
-        yield (0, bookQueriesUtil_1.deleteBookFromDB)();
-    }));
+        }));
+    });
 };
 const cornStart = (credentials) => {
     task(credentials).start();

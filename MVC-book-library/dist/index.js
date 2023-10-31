@@ -21,6 +21,7 @@ const adminRoutes_1 = __importDefault(require("./routes/adminRoutes"));
 const conversionRoutes_1 = __importDefault(require("./routes/conversionRoutes"));
 const authMiddleware_1 = __importDefault(require("./middlewares/authMiddleware"));
 const cron_1 = require("./utils/cron");
+const runMigrations_1 = __importDefault(require("./utils/runMigrations"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = 3000;
@@ -41,10 +42,11 @@ app.listen(port, () => __awaiter(void 0, void 0, void 0, function* () {
             throw new Error('No db credentials');
         }
         (0, dbConnection_1.connectDB)(process.env.MYSQL_CONNECTION);
+        (0, runMigrations_1.default)();
         (0, cron_1.cornStart)(process.env.MYSQL_CONNECTION);
+        console.log('server is running');
     }
     catch (err) {
         console.log(err);
     }
-    console.log('server is running');
 }));
