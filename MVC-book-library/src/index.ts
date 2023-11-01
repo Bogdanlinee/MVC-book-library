@@ -1,5 +1,4 @@
-import express, {Request, response, Response} from 'express';
-import morgan from 'morgan';
+import express from 'express';
 import dotenv from 'dotenv';
 import {connectDB} from './db/dbConnection';
 import booksRouter from './routes/booksRoutes';
@@ -9,16 +8,13 @@ import auth from './middlewares/authMiddleware';
 import {cornStart} from './utils/cron';
 import runMigrations from './utils/runMigrations';
 
-
 dotenv.config();
 
 const app = express();
 const port = 3000;
 
-app.use(morgan('tiny'))
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
-
 
 // serve static
 app.use('/', express.static('public/books-page'));

@@ -111,25 +111,14 @@ const deleteStatsConnections = (bookId: number) => {
 }
 
 const promise = (query: string, args?: (string | number)[]) => {
-    if (args) {
-        return new Promise((resolve, reject) => {
-            db.query(query, args, function (err, result) {
-                if (err) {
-                    reject(err);
-                }
-                resolve(result);
-            })
+    return new Promise((resolve, reject) => {
+        db.query(query, args, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            resolve(result);
         })
-    } else {
-        return new Promise((resolve, reject) => {
-            db.query(query, function (err, result) {
-                if (err) {
-                    reject(err);
-                }
-                resolve(result);
-            })
-        })
-    }
+    });
 }
 
 export {
